@@ -6,7 +6,7 @@
 /*   By: apetitje <apetitje@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/13 13:28:22 by apetitje          #+#    #+#             */
-/*   Updated: 2016/11/14 12:31:34 by apetitje         ###   ########.fr       */
+/*   Updated: 2016/11/17 12:35:54 by apetitje         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ int		get_next_line(const int fd, char **line)
 
 	ret = 0;
 	i = 0;
-	if (BUFF_SIZE < 1 || !fd || fd < 0)
+	if (BUFF_SIZE < 1 || fd < 0)
 		return (-1);
 	while ((ret = read(fd, buffer, BUFF_SIZE)))
 	{
