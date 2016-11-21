@@ -6,7 +6,7 @@
 /*   By: apetitje <apetitje@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/13 13:28:22 by apetitje          #+#    #+#             */
-/*   Updated: 2016/11/21 16:16:51 by apetitje         ###   ########.fr       */
+/*   Updated: 2016/11/21 18:04:59 by apetitje         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,12 +86,12 @@ int		ft_is_ended(char **line, t_lst *ele)
 	{
 		len = ft_line_len(ele->stock);
 		*line = ft_strndup(ele->stock, len);
-		if (len == 0)
-			return (0);
 		if (ele->stock[len] == '\0')
 		{
 			free(ele->stock);
 			ele->stock = NULL;
+			if (len == 0)
+				return (0);
 		}
 		else
 		{
@@ -106,12 +106,12 @@ int		ft_is_ended(char **line, t_lst *ele)
 
 int		get_next_line(const int fd, char **line)
 {
-	int				i;
-	char			buffer[BUFF_SIZE + 1];
-	int				ret;
 	static t_lst	*begin_lst = NULL;
+	char			buffer[BUFF_SIZE + 1];
+	int				i;
+	int				ret;
 	t_lst			*ele;
-	
+
 	ret = 0;
 	i = 0;
 	if (!line || BUFF_SIZE < 1 || fd < 0)
