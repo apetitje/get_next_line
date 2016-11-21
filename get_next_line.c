@@ -6,7 +6,7 @@
 /*   By: apetitje <apetitje@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/13 13:28:22 by apetitje          #+#    #+#             */
-/*   Updated: 2016/11/17 12:35:54 by apetitje         ###   ########.fr       */
+/*   Updated: 2016/11/21 16:16:51 by apetitje         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,89 +14,118 @@
 
 int		ft_line_len(const char *str)
 {
-	int		i;
+	int		len;
 
-	i = 0;
-	while (str[i] && str[i] == '\n')
-		i++;
-	while (str[i] && str[i] != '\n')
-		i++;
-	return (i);
+	len = 0;
+	while (str[len] && str[len] != '\n')
+		len++;
+	return (len);
 }
 
-int		ft_is_over(char	**tmp, char **line)
+t_lst	*ft_find_ele(const int fd, t_lst **lst)
 {
-	int		i;
+	t_lst *ptr;
+	t_lst *new_ele;
 
-	i = 0;
-	if (**tmp)
+	ptr = NULL;
+	if (*lst)
+		ptr = *lst;
+	while (ptr != NULL)
 	{
-		i = ft_line_len(*tmp);
-		*line = ft_strndup(*tmp, i);
-		if ((*tmp)[i] == '\n' || *(tmp)[i] == '\0')
+		if (ptr->fd == fd)
+			return (ptr);
+		ptr = ptr->next;
+	}
+	if (!(new_ele = (t_lst *)(malloc(sizeof(t_lst)))))
+		return (NULL);
+	new_ele->fd = fd;
+	new_ele->stock = NULL;
+	new_ele->next = NULL;
+	if (!*lst)
+		*lst = new_ele;
+	else
+	{
+		new_ele->next = *lst;
+		*lst = new_ele;
+	}
+	return (new_ele);
+}
+
+int		ft_is_reading(char **line, t_lst *ele, char *buffer)
+{
+	int		len;
+	char	*stock2;
+
+	if (ele->stock)
+	{
+		ele->stock = (char *)ft_realloc(ele->stock, ft_strlen(buffer)
+				+ ft_strlen(ele->stock) + 1);
+		ele->stock = ft_strcat(ele->stock, buffer);
+	}
+	else
+		ele->stock = ft_strdup(buffer);
+	len = ft_line_len(ele->stock);
+	if (ele->stock[len] == '\n')
+	{
+		*line = ft_strndup(ele->stock, len);
+		stock2 = ft_strdup(&(ele->stock[len + 1]));
+		free(ele->stock);
+		ele->stock = stock2;
+		return (1);
+	}
+	return (0);
+}
+
+int		ft_is_ended(char **line, t_lst *ele)
+{
+	int		len;
+	char	*stock2;
+
+	len = 0;
+	if (ele->stock)
+	{
+		len = ft_line_len(ele->stock);
+		*line = ft_strndup(ele->stock, len);
+		if (len == 0)
+			return (0);
+		if (ele->stock[len] == '\0')
 		{
-			while ((*tmp)[i] == '\n')
-					i++;
-			*tmp = &((*tmp)[i]);
-// regler pb de fuite memoire.
-			return (1);
+			free(ele->stock);
+			ele->stock = NULL;
 		}
+		else
+		{
+			stock2 = ft_strdup(&(ele->stock[len + 1]));
+			free(ele->stock);
+			ele->stock = stock2;
+		}
+		return (1);
 	}
 	return (0);
 }
 
 int		get_next_line(const int fd, char **line)
 {
-	static char		*tmp = 0;
-	int 			i;
-	int				i_last;
+	int				i;
 	char			buffer[BUFF_SIZE + 1];
 	int				ret;
-
+	static t_lst	*begin_lst = NULL;
+	t_lst			*ele;
+	
 	ret = 0;
 	i = 0;
-	if (BUFF_SIZE < 1 || fd < 0)
+	if (!line || BUFF_SIZE < 1 || fd < 0)
+		return (-1);
+	ele = ft_find_ele(fd, &begin_lst);
+	if (ele == NULL)
 		return (-1);
 	while ((ret = read(fd, buffer, BUFF_SIZE)))
 	{
 		if (ret == -1)
 			return (-1);
-		i_last = i;
 		buffer[ret] = '\0';
-		i = ft_line_len(buffer);
-		if (!*line)
-		{
-			if (tmp)
-			{
-				*line = ft_strdup(tmp);
-				i = ft_strlen(tmp) + i;
-				*line = (char *)ft_realloc(*line, i);
-				*line = ft_strncat(*line, buffer, i);
-			}
-			else
-				*line = ft_strndup(buffer, i);
-		}
-		else
-		{
-			*line = (char *)ft_realloc(*line, i + i_last);
-			*line = ft_strncat(*line, buffer, i);
-
-		}
-		if (buffer[i] == '\n' || buffer[i] == '\0')
-		{
-			while (buffer[i] == '\n')
-				i++;
-			tmp = ft_strdup(&(buffer[i]));
-			return (1);
-		}
-	}
-	if (!ret)
-	{
-		if (ft_is_over(&tmp, line))
+		if (ft_is_reading(line, ele, buffer) == 1)
 			return (1);
 	}
-	return (0);
+	return (ft_is_ended(line, ele));
 }
-
-//si aucune info il faut renvoyer une ligne avec '\0'
-//penser a free tmp

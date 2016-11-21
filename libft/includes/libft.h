@@ -6,7 +6,7 @@
 /*   By: apetitje <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/04 12:18:37 by apetitje          #+#    #+#             */
-/*   Updated: 2016/11/14 10:25:54 by apetitje         ###   ########.fr       */
+/*   Updated: 2016/11/21 11:23:17 by apetitje         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ typedef struct		s_list
 	struct s_list	*next;
 }					t_list;
 
-char 				*ft_strndup(const char *s1, size_t len);
+char				*ft_strndup(const char *s1, size_t len);
 void				*ft_realloc(void *ptr, size_t size);
 int					ft_sqrt(int nb);
 void				ft_lstadd(t_list **alst, t_list *new);

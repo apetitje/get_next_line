@@ -6,7 +6,7 @@
 /*   By: apetitje <apetitje@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/13 13:28:30 by apetitje          #+#    #+#             */
-/*   Updated: 2016/11/17 12:14:08 by apetitje         ###   ########.fr       */
+/*   Updated: 2016/11/21 14:10:08 by apetitje         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,15 @@
 # include <sys/types.h>
 # include <unistd.h>
 
-# define BUFF_SIZE	2000
+# define BUFF_SIZE 100
 
-int		get_next_line(const int fd, char **line);
+typedef struct		s_lst
+{
+	int				fd;
+	char			*stock;
+	struct s_lst	*next;
+}					t_lst;
+
+int					get_next_line(const int fd, char **line);
 
 #endif
